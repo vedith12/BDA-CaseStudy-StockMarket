@@ -5,7 +5,6 @@ This project is a complete Big Data and Machine Learning pipeline that streams, 
 ---
 
 ## 🏗️ System Architecture (Flow of Events)
-*Explain this exact flow to your professor/sir to demonstrate how the Big Data pipeline works:*
 
 1. **Apache Kafka (The Ingestion Layer)**
    - Our `kafka_producer.py` continuously pulls live stock data (AAPL, TSLA, INFY) from Yahoo Finance.
