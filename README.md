@@ -53,7 +53,7 @@ python3 kafka_producer.py --mode realtime --stocks AAPL TSLA GOOG INFY
 cd /mnt/e/BDA-kafkaCS/stock_prediction_system/ml_models
 while true; do python3 train_models_no_spark.py; echo "Sleeping for 1 Hour..."; sleep 3600; done 
 ```
-> **Important**: Running `train_models_no_spark.py` is essential! It generates the `metrics.json` file which populates the "Model Accuracy" sidebar on the React dashboard.
+
 
 ### Step 3: Serve the API & Models
 ```bash
