@@ -25,10 +25,6 @@ This project is a complete Big Data and Machine Learning pipeline that streams, 
 
 ---
 
-## 🚀 Daily Startup Guide (After closing your laptop)
-
-If you turn your PC off and need to start everything up to show your professor tomorrow, follow these exact steps (open a new terminal window for each step):
-
 ### Step 1: Start the Big Data Core (Zookeeper & Kafka)
 *Note: Make sure your Kafka directory paths match where you installed it.*
 ```bash
