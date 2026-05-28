@@ -1,0 +1,2 @@
+v1
+{"path":"file:///mnt/e/BDA-kafkaCS/stock_prediction_system/data/parquet_files/ticker=AAPL/part-00000-4340039e-4f55-4e05-aa0b-848aaed94502.c000.snappy.parquet","size":1119,"isDir":false,"modificationTime":1777906197524,"blockReplication":1,"blockSize":33554432,"action":"add"}

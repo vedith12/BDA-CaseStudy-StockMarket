@@ -1,0 +1,10 @@
+yfinance
+kafka-python
+pyspark
+pandas
+scikit-learn
+xgboost
+fastapi
+uvicorn
+joblib
+plotly

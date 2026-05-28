@@ -1,0 +1,34 @@
+{
+    "AAPL": {
+        "Linear Regression": "99.90%",
+        "Random Forest": "99.86%",
+        "SVR": "99.84%",
+        "XGBoost": "99.85%",
+        "Voting Ensemble": "99.87%",
+        "Stacking Ensemble": "99.91%"
+    },
+    "GOOG": {
+        "Linear Regression": "99.89%",
+        "Random Forest": "98.41%",
+        "SVR": "97.17%",
+        "XGBoost": "98.39%",
+        "Voting Ensemble": "98.49%",
+        "Stacking Ensemble": "99.88%"
+    },
+    "INFY": {
+        "Linear Regression": "99.85%",
+        "Random Forest": "98.96%",
+        "SVR": "98.96%",
+        "XGBoost": "98.85%",
+        "Voting Ensemble": "99.19%",
+        "Stacking Ensemble": "99.84%"
+    },
+    "TSLA": {
+        "Linear Regression": "99.82%",
+        "Random Forest": "99.76%",
+        "SVR": "99.79%",
+        "XGBoost": "99.78%",
+        "Voting Ensemble": "99.80%",
+        "Stacking Ensemble": "99.82%"
+    }
+}

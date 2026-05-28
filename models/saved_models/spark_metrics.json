@@ -1,0 +1,22 @@
+{
+    "AAPL": {
+        "Linear Regression": "99.97%",
+        "Random Forest": "99.91%",
+        "GBTRegressor": "99.90%"
+    },
+    "GOOG": {
+        "Linear Regression": "99.97%",
+        "Random Forest": "99.84%",
+        "GBTRegressor": "99.83%"
+    },
+    "INFY": {
+        "Linear Regression": "99.94%",
+        "Random Forest": "99.73%",
+        "GBTRegressor": "99.71%"
+    },
+    "TSLA": {
+        "Linear Regression": "99.95%",
+        "Random Forest": "99.84%",
+        "GBTRegressor": "99.82%"
+    }
+}

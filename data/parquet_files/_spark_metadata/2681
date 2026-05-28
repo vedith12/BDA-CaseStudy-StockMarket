@@ -1,0 +1,2 @@
+v1
+{"path":"file:///mnt/e/BDA-kafkaCS/stock_prediction_system/data/parquet_files/ticker=INFY/part-00000-fcd82dec-2983-45c8-aa7d-eb58b261f113.c000.snappy.parquet","size":1118,"isDir":false,"modificationTime":1777906056257,"blockReplication":1,"blockSize":33554432,"action":"add"}

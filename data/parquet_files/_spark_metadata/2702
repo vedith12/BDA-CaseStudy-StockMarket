@@ -1,0 +1,3 @@
+v1
+{"path":"file:///mnt/e/BDA-kafkaCS/stock_prediction_system/data/parquet_files/ticker=AAPL/part-00000-28182baa-a47a-44cd-b6ca-3e3c4015e391.c000.snappy.parquet","size":1119,"isDir":false,"modificationTime":1779901113648,"blockReplication":1,"blockSize":33554432,"action":"add"}
+{"path":"file:///mnt/e/BDA-kafkaCS/stock_prediction_system/data/parquet_files/ticker=GOOG/part-00001-0893fe93-b0e3-4bdd-8a32-ceee28a94c86.c000.snappy.parquet","size":1119,"isDir":false,"modificationTime":1779901113641,"blockReplication":1,"blockSize":33554432,"action":"add"}

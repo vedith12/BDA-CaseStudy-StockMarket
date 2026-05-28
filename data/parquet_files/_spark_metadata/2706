@@ -1,0 +1,4 @@
+v1
+{"path":"file:///mnt/e/BDA-kafkaCS/stock_prediction_system/data/parquet_files/ticker=GOOG/part-00000-e1e99b69-5a50-4172-b4c4-667be18545bf.c000.snappy.parquet","size":1119,"isDir":false,"modificationTime":1779901239359,"blockReplication":1,"blockSize":33554432,"action":"add"}
+{"path":"file:///mnt/e/BDA-kafkaCS/stock_prediction_system/data/parquet_files/ticker=TSLA/part-00001-45e4df54-d82c-4a2c-91a6-237dcd30d5de.c000.snappy.parquet","size":1119,"isDir":false,"modificationTime":1779901239350,"blockReplication":1,"blockSize":33554432,"action":"add"}
+{"path":"file:///mnt/e/BDA-kafkaCS/stock_prediction_system/data/parquet_files/ticker=INFY/part-00002-ac56072f-6879-4161-b023-4aeb2b9c377b.c000.snappy.parquet","size":1119,"isDir":false,"modificationTime":1779901239362,"blockReplication":1,"blockSize":33554432,"action":"add"}

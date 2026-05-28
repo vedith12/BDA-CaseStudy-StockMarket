@@ -1,0 +1,927 @@
+\documentclass[12pt,a4paper]{report}
+
+% ===================== PREAMBLE =====================
+
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{adjustbox}
+
+\definecolor{lightgray}{gray}{0.95}
+
+\lstset{
+    backgroundcolor=\color{lightgray},
+    basicstyle=\ttfamily\small,
+    frame=single,
+    breaklines=true,
+    captionpos=b,
+    keepspaces=true,
+    showstringspaces=false
+}
+
+\usepackage{enumitem}
+\setlist[itemize]{noitemsep, topsep=0pt}
+\setlist[enumerate]{noitemsep, topsep=0pt}
+
+
+% ----- Margins -----
+\usepackage[a4paper, top=1in, bottom=1in, left=1.25in, right=1.25in]{geometry}
+
+% ----- Times New Roman -----
+\usepackage{mathptmx}
+
+% Line spacing
+\usepackage{setspace}
+\setstretch{1.5}
+
+% Additional packages
+\usepackage{graphicx}
+\usepackage{titlesec}
+\usepackage{hyperref}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{parskip}
+\usepackage{multirow}
+\usepackage{booktabs}
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric, arrows, positioning}
+
+% ----- Page Number at Bottom Center -----
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0pt}
+
+% ----- Heading Formatting -----
+% Main headings - 14pt, bold, uppercase, centered
+\titleformat{\section}
+{\normalfont\fontsize{14pt}{16pt}\bfseries\centering\MakeUppercase}
+{\thesection}{1em}{}
+
+% Subheading – 12pt, bold, sentence case, left
+\titleformat{\subsection}
+{\normalfont\fontsize{12pt}{14pt}\bfseries}
+{\thesubsection}{1em}{}
+
+% Sub-subheading – 12pt, bold italic, left
+\titleformat{\subsubsection}
+{\normalfont\fontsize{12pt}{14pt}\bfseries\itshape}
+{\thesubsubsection}{1em}{}
+
+% ----- Caption Formatting -----
+\captionsetup{
+    font={bf,11pt},
+    labelsep=period
+}
+\setcounter{secnumdepth}{3}
+\renewcommand{\thesection}{\arabic{section}}
+\renewcommand{\thesubsection}{\arabic{section}.\arabic{subsection}}
+
+
+% ----------------- START DOCUMENT -----------------
+\begin{document}
+
+% ----------------- TITLE PAGE -----------------
+\begin{titlepage}
+\thispagestyle{empty}
+
+\begin{center}
+
+% -------- College Logo --------
+\includegraphics[width=3cm]{cbit_logo.png}\\[0.4cm]
+
+{\Large \textbf{CHAITANYA BHARATHI INSTITUTE OF TECHNOLOGY}}\\
+{\normalsize (Autonomous)}\\[0.4cm]
+
+
+{\Large \textbf{BIG DATA ANALYTICS}}\\
+{\large Assignment -- 1}\\[0.6cm]
+
+{\large \textbf{REPORT ON}}\\[0.3cm]
+
+{\LARGE \textbf{Post-Mortem Analysis of the MapReduce Framework}}\\
+{\Large \textbf{Using Large-Scale Taxi Trip Data Analytics}}\\[0.8cm]
+
+
+
+\begin{tabular}{c}
+\textbf{Submitted by} \\[0.3cm]
+Mohammed Faizan Ul Islam \quad (160123737195)\\
+Vedith Vanam \quad (160123737207)\\
+Shashidhar Nagunuri \quad (160123737317)\end{tabular}\\[0.9cm]
+
+\textbf{Under the Guidance of}\\
+Dr. N. Sudhakar Yadav\\[0.6cm]
+
+Department of Information Technology\\
+Chaitanya Bharathi Institute of Technology\\[0.6cm]
+
+\textbf{Academic Year: 2025--2026}
+
+\end{center}
+
+\end{titlepage}
+
+
+% ----------------- CERTIFICATE PAGE -----------------
+\newpage
+
+\begin{center}
+{\LARGE \textbf{ABSTRACT}}
+\end{center}
+
+\addcontentsline{toc}{section}{Abstract}
+
+\vspace{0.5cm}
+
+The rapid growth of urban transportation systems and digital taxi services has resulted
+in the continuous generation of large volumes of trip-level data. Each taxi trip record
+captures spatial, temporal, operational, and financial information, making such datasets
+valuable for large-scale analytical studies. However, traditional single-node processing
+techniques are inefficient for handling datasets containing millions of records.
+
+This report presents a comprehensive post-mortem analysis of the Hadoop MapReduce
+programming model using large-scale taxi trip data analytics as a case study. The dataset
+was processed using Hadoop MapReduce across multiple storage formats including CSV,
+Parquet, and Avro. Hadoop Streaming with Python-based mapper and reducer programs
+was used for CSV processing, while Java MapReduce implementations were used for
+Parquet and Avro datasets.
+
+Multiple MapReduce jobs were executed to analyze pickup locations, drop-off locations,
+passenger count distribution, payment type frequency, trip type classification, and trip
+frequency distribution across hours of the day. The study evaluates MapReduce
+performance with respect to scalability, fault tolerance, execution time, and storage
+efficiency under different file formats.
+
+The results demonstrate that storage format significantly influences distributed processing
+performance. CSV requires higher parsing overhead, while Parquet provides columnar
+compression advantages and Avro offers efficient binary serialization. These findings
+provide practical insights into the role of storage formats in improving efficiency and
+scalability in distributed big data processing frameworks.
+
+\clearpage
+
+
+% ----------------- CERTIFICATE PAGE -----------------
+
+\newpage
+
+% ----------------- TOC / LOF / LOT -----------------
+\addcontentsline{toc}{section}{TABLE OF CONTENTS}
+\tableofcontents
+\clearpage
+\listoffigures
+\addcontentsline{toc}{section}{LIST OF FIGURES}
+\clearpage
+\listoftables
+\addcontentsline{toc}{section}{LIST OF TABLES}
+\clearpage
+
+\pagenumbering{arabic}
+\setcounter{page}{1}
+\setlength{\parindent}{20pt} % Paragraph indentation
+\setlength{\parskip}{1.0em} % Space between paragraphs
+
+% ----------------- INTRODUCTION -----------------
+\newpage
+\pagenumbering{arabic}
+\section{Introduction}
+
+The rapid growth of urban transportation systems and digital taxi services has led to the
+continuous generation of large volumes of trip-level data. Taxi trip datasets record
+detailed information such as pickup and drop-off locations, timestamps, passenger
+counts, trip distance, and fare-related attributes. When collected over long periods,
+these datasets grow to millions of records and become valuable for understanding
+transportation demand and travel behavior.
+
+Analyzing taxi trip data enables transportation authorities and service providers to
+identify demand hotspots, study passenger patterns, and evaluate operational
+efficiency. However, the large size and complexity of such datasets pose significant
+challenges for traditional single-machine data processing techniques. Centralized
+systems suffer from limited scalability, high execution latency, and poor fault tolerance
+when handling large-scale data.
+
+To address these challenges, distributed data processing frameworks have become
+essential. The MapReduce programming model provides a scalable approach for
+processing large datasets by dividing computations into map and reduce phases that
+can be executed in parallel. Apache Hadoop offers an open-source implementation of
+MapReduce along with a distributed storage layer, enabling reliable batch-oriented
+analytics on commodity hardware.
+
+In this study, the MapReduce framework is applied to a large taxi trip dataset to evaluate
+its effectiveness for batch analytics. The dataset is processed using multiple file formats
+including CSV, Parquet, and Avro to compare execution performance and storage
+efficiency. Sequential processing is also considered as a baseline for understanding the
+benefits of distributed computation.
+
+Multiple MapReduce jobs are executed to analyze different attributes of the dataset,
+including pickup location frequency, drop-off location frequency, passenger count
+distribution, payment type frequency, trip type classification, and hourly trip distribution.
+These analyses enable evaluation of MapReduce performance and execution behavior
+under realistic data characteristics.
+
+
+\subsection{Motivation}
+
+Although MapReduce has been widely adopted for batch-oriented big data processing,
+its real-world performance characteristics are best understood through empirical
+evaluation. Transportation datasets often exhibit repetitive categorical values, skewed
+distributions, and varying aggregation requirements, all of which influence MapReduce
+execution.
+
+Different file formats can also influence performance characteristics. CSV requires text
+parsing during processing, while Parquet provides columnar storage benefits and Avro
+supports efficient binary serialization. Evaluating these formats helps in understanding
+how storage structure affects distributed processing efficiency.
+
+The motivation of this study is to analyze the behavior of the MapReduce framework
+when applied to a realistic large-scale taxi trip dataset stored in multiple file formats.
+
+
+\subsection{Problem Statement}
+
+The primary problem addressed in this report is the scalable analysis of large-scale taxi
+trip data using the MapReduce programming model. The study seeks to evaluate how
+MapReduce performs when processing millions of trip records and executing multiple
+aggregation-based analytical workloads with different key distributions.
+
+Additionally, the study compares performance differences when the dataset is stored in
+CSV, Parquet, and Avro formats, and contrasts distributed processing with sequential
+processing approaches.
+
+
+\subsection{Objectives of the Study}
+
+The objectives of this study are as follows:
+
+\begin{itemize}
+    \item To process large-scale taxi trip data using the MapReduce framework.
+    \item To implement multiple MapReduce jobs for analyzing transportation data.
+    \item To evaluate MapReduce performance through post-execution analysis.
+    \item To compare CSV, Parquet, and Avro file formats in distributed processing.
+\end{itemize}
+
+
+\subsection{Scope of the Report}
+
+The scope of this report is limited to batch-oriented analytics performed using the
+Apache Hadoop MapReduce framework. The analysis focuses on descriptive and
+aggregation-based processing of taxi trip data using CSV, Parquet, and Avro file formats.
+
+Real-time analytics, predictive modeling, and in-memory processing frameworks are
+beyond the scope of this study.
+
+
+\clearpage
+% ----------------- EXISTING SYSTEM -----------------
+\section{Background and Related Work}
+
+The rapid growth of data-intensive applications across domains such as transportation,
+finance, healthcare, and e-commerce has significantly influenced the evolution of data
+processing systems. Early data management solutions were primarily designed to handle
+structured data using centralized architectures. Relational database management systems
+and traditional batch processing tools were effective for moderate workloads but relied
+heavily on vertical scaling to improve performance.
+
+As data volume and complexity increased, the limitations of centralized processing
+became increasingly evident. Single-node systems struggled to process large datasets
+within acceptable time limits and were highly susceptible to hardware and software
+failures. Furthermore, many real-world datasets, including transportation data, exhibit
+semi-structured characteristics that are difficult to manage using conventional database
+approaches.
+
+These challenges led to the development of distributed data processing models that
+emphasize horizontal scalability, parallel execution, and fault tolerance. Distributed
+systems allow datasets to be partitioned across multiple machines, enabling simultaneous
+processing and improved reliability.
+
+The MapReduce programming model, originally proposed by Google, simplified distributed
+processing by dividing computation into two operations—map and reduce. Apache Hadoop
+provided an open-source implementation of MapReduce along with the Hadoop
+Distributed File System (HDFS), enabling scalable batch-oriented analytics.
+
+In modern big data ecosystems, datasets are commonly stored in formats such as CSV,
+Parquet, and Avro. CSV is simple and widely supported but requires text parsing during
+processing. Parquet provides columnar storage that improves compression and query
+efficiency, while Avro supports binary serialization with schema information. These file
+formats influence storage efficiency and processing performance in distributed systems.
+
+Although MapReduce remains effective for large-scale batch processing, newer frameworks
+such as Apache Spark have been developed to address limitations related to latency and
+iterative processing. Nevertheless, MapReduce continues to be widely used for reliable
+large-scale aggregation tasks.
+\clearpage
+% ----------------------------------
+\section{MapReduce Framework Overview}
+
+The MapReduce framework is a distributed programming model designed to process
+large-scale datasets across clusters of commodity hardware. It simplifies parallel data
+processing by abstracting complexities such as task scheduling, data distribution, and
+fault tolerance. This allows developers to build scalable data processing applications
+without managing low-level distributed system details.
+
+MapReduce operates in close integration with the Hadoop Distributed File System
+(HDFS), which provides reliable and scalable storage for large datasets. Input data is
+divided into blocks and distributed across multiple nodes. These blocks may contain
+datasets stored in formats such as CSV, Parquet, or Avro, and are processed in parallel
+by mapper tasks. Intermediate results are aggregated by reducer tasks to produce the
+final output.
+
+
+\subsection{Hadoop Distributed File System (HDFS)}
+
+HDFS is a distributed storage system designed to store large files across multiple
+machines while ensuring reliability and scalability. It follows a master–slave architecture
+consisting of a NameNode and multiple DataNodes. The NameNode maintains metadata
+such as file names and block locations, while DataNodes store the actual data blocks.
+
+To provide fault tolerance, HDFS replicates each data block across multiple nodes. In the
+event of node failure, data can be retrieved from another replica without interrupting
+processing. HDFS supports multiple file formats including CSV, Parquet, and Avro.
+
+
+\subsection{Map Phase}
+
+The map phase is the first stage of execution. Each mapper processes a portion of input
+data and transforms it into intermediate key–value pairs. The mapper typically performs
+operations such as parsing records, filtering data, and extracting required attributes.
+
+In transportation data analysis, mapper functions extract attributes such as pickup
+location, drop-off location, passenger count, payment type, trip type, and timestamp.
+Each extracted attribute is emitted as a key associated with a value representing its
+occurrence.
+
+
+\subsection{Shuffle and Sort Phase}
+
+The shuffle and sort phase connects the map and reduce phases. During this stage,
+intermediate key–value pairs are redistributed across the cluster so that all values
+associated with the same key are grouped together and sent to the appropriate reducer.
+
+This phase involves network communication and disk operations, making it one of the
+most resource-intensive stages of MapReduce execution.
+
+
+\subsection{Reduce Phase}
+
+The reduce phase aggregates grouped intermediate data produced during the shuffle
+phase. Each reducer processes a unique key and list of associated values to compute
+final results such as counts or summaries.
+
+The aggregated output is written back to HDFS for further analysis.
+
+
+\subsection{Fault Tolerance and Data Locality}
+
+Fault tolerance is a key feature of MapReduce. If a mapper or reducer task fails, the
+framework automatically re-executes the task on another node, ensuring reliable
+completion of jobs on datasets stored in CSV, Parquet, or Avro formats.
+
+MapReduce also uses data locality by scheduling tasks on nodes where data is stored,
+reducing network transfer and improving execution efficiency.
+\clearpage
+
+% ----------------------------------
+\section{Case Study Description}
+
+This study focuses on the large-scale analysis of taxi trip data using the MapReduce
+framework. Modern urban transportation systems generate extensive trip-level data as
+a result of continuous daily operations. Each taxi trip produces a structured record
+containing information related to trip origin, destination, passenger details, payment
+characteristics, and timestamp information. Due to their high volume and repetitive
+nature, taxi trip datasets are well-suited for batch-oriented distributed processing
+frameworks such as MapReduce.
+
+The selected case study evaluates the effectiveness of MapReduce for processing and
+analyzing large transportation datasets stored in multiple file formats including CSV,
+Parquet, and Avro. These workloads are designed to vary in key distribution and
+aggregation complexity, enabling detailed observation of MapReduce execution behavior
+and performance characteristics.
+
+
+\subsection{Analytical Problem Definition}
+
+The primary objective of this case study is to extract meaningful insights from a large
+taxi trip dataset in a scalable and fault-tolerant manner. Specifically, the study aims to
+address the following analytical questions:
+
+\begin{itemize}
+    \item Which pickup locations generate the highest number of taxi trips?
+    \item Which drop-off locations are most frequently used by passengers?
+    \item How are taxi trips distributed based on passenger count?
+    \item What payment methods are most commonly used for taxi services?
+    \item How are taxi trips classified based on trip type?
+    \item How are taxi trips distributed across different hours of the day?
+\end{itemize}
+
+Answering these questions using traditional sequential processing approaches becomes
+computationally expensive as dataset size increases. Therefore, the MapReduce
+framework is used to perform distributed aggregation-based analytics.
+
+
+\subsection{Dataset Description}
+
+The dataset used in this study consists of over one million taxi trip records collected
+during the year 2020. Each record corresponds to an individual taxi trip and includes
+attributes related to pickup location, drop-off location, passenger count, payment type,
+trip type, and timestamp information.
+
+The dataset is stored in CSV, Parquet, and Avro formats to evaluate how storage
+structure influences distributed processing performance. The size and diversity of the
+dataset make it suitable for evaluating scalability and efficiency of the MapReduce
+framework.
+
+
+\subsection{Data Record Format}
+
+The dataset is represented in multiple structured formats.
+
+CSV (Comma-Separated Values) stores records in text format where attributes are
+separated by commas. It is simple and widely supported but requires parsing during
+processing.
+
+Parquet stores data in columnar format, enabling efficient compression and improved
+performance for analytical queries that access specific attributes.
+
+Avro stores data in binary row format along with schema information, providing compact
+storage and efficient serialization in distributed environments.
+
+Using multiple file formats enables comparison of execution time, storage efficiency,
+and processing complexity within Hadoop MapReduce.
+
+
+\subsection{Rationale for Case Study Selection}
+
+Taxi trip data analytics was selected as the case study due to its practical relevance,
+large data volume, and suitability for batch-oriented distributed processing. Transportation
+datasets contain repetitive categorical values such as locations, payment types, and trip
+categories, making them suitable for aggregation-based analysis using MapReduce.
+
+The dataset characteristics allow evaluation of MapReduce performance under realistic
+conditions including skewed key distributions and large data volume. Comparing CSV,
+Parquet, and Avro formats also helps in understanding how storage structure affects
+processing efficiency in distributed systems.
+\clearpage 
+
+% ----------------------------------
+\section{Design and Implementation of MapReduce Jobs}
+
+This section describes the design and implementation of the MapReduce jobs developed
+for analyzing large-scale taxi trip data. Each analytical task is implemented as an
+independent MapReduce job. CSV datasets are processed using Hadoop Streaming with
+Python-based mapper and reducer programs, while Parquet and Avro datasets are
+processed using Java MapReduce with ParquetInputFormat and AvroKeyInputFormat.
+
+All MapReduce jobs follow a common design pattern. The mapper extracts a relevant
+attribute from each input record and emits it as a key with a value of one. A shared
+reducer program is used across all jobs to aggregate values associated with each key
+and compute final counts. This ensures consistency of logic across CSV, Parquet, and
+Avro datasets.
+
+
+\subsection{Pickup Location Frequency Analysis}
+
+The pickup location frequency analysis identifies areas with the highest taxi demand by
+counting the number of trips originating from each pickup location. The mapper extracts
+the pickup location identifier from each taxi trip record and emits it as a key with value
+one. The reducer aggregates these values to compute the total number of trips for each
+pickup location.
+
+This analysis helps in understanding spatial demand patterns and identifying high-traffic
+zones. Due to repetitive location identifiers, this workload also allows observation of key
+skew and reducer load imbalance during MapReduce execution.
+
+
+\subsection{Drop-off Location Frequency Analysis}
+
+The drop-off location frequency analysis identifies commonly used destinations in taxi
+trips. The mapper extracts the drop-off location identifier from each record and emits it
+as a key-value pair with value one. The reducer aggregates these values to compute the
+total number of trips ending at each location.
+
+This analysis provides insight into passenger destination trends and allows evaluation of
+MapReduce performance under uneven key distribution.
+
+
+\subsection{Passenger Count Distribution Analysis}
+
+The passenger count distribution analysis examines how taxi trips are distributed based
+on the number of passengers per trip. The mapper extracts the passenger count
+attribute and emits it as the key. The reducer aggregates values to compute frequency
+distribution of passenger counts.
+
+Since the number of distinct passenger count values is limited, this workload results in
+relatively balanced reducer execution compared to location-based analyses.
+
+
+\subsection{Payment Type Frequency Analysis}
+
+The payment type frequency analysis evaluates customer payment preferences by
+counting the number of trips associated with each payment method. The mapper extracts
+the payment type field and emits it as a key with value one. The reducer aggregates
+counts to produce distribution of payment methods.
+
+This workload demonstrates MapReduce performance for datasets with small key space,
+resulting in efficient reducer execution.
+
+
+\subsection{Trip Type Distribution Analysis}
+
+The trip type distribution analysis classifies taxi trips based on service category. The
+mapper extracts the trip type attribute and emits it as the key. The reducer aggregates
+values to determine distribution of trip types.
+
+This workload provides insight into operational characteristics of taxi services and
+demonstrates aggregation on categorical attributes.
+
+
+\subsection{Hourly Trip Frequency Analysis}
+
+The hourly trip frequency analysis computes the total number of taxi trips occurring in
+each hour of the day. The mapper extracts the pickup timestamp from each record,
+converts it into hour format (0–23), and emits the hour as the key with value one.
+
+The reducer aggregates values corresponding to each hour to produce the total number
+of trips occurring during each hour of the day. This job is executed on CSV, Parquet, and
+Avro datasets to compare execution performance across file formats.
+
+
+\subsection{Common Reducer Implementation}
+
+A single reducer implementation is used across all MapReduce jobs to perform
+aggregation. The reducer receives intermediate key–value pairs sorted by key and sums
+values associated with each key to compute final counts.
+
+Using a common reducer ensures consistency of aggregation logic across all analytical
+workloads and file formats. The reducer outputs results to HDFS, where they are later
+retrieved for analysis and comparison.
+\clearpage
+% ----------------------------------
+\section{File Format Based Implementation}
+
+To evaluate the impact of storage format on distributed processing performance,
+the same taxi trip dataset was stored and processed using three different formats:
+CSV, Parquet, and Avro. The objective was to observe differences in execution
+time, storage efficiency, parsing complexity, and MapReduce performance.
+
+\subsection{CSV Format Processing}
+
+The dataset was initially stored in CSV format and processed using Hadoop Streaming
+with Python-based mapper and reducer programs. CSV is a row-based text format,
+requiring parsing of each record before extracting attributes such as pickup timestamp.
+
+Characteristics observed:
+\begin{itemize}
+\item Human readable format
+\item Requires text parsing for each record
+\item Larger file size compared to binary formats
+\item Higher I/O overhead
+\end{itemize}
+
+\subsection{Parquet Format Processing}
+
+The dataset was converted into Parquet format and processed using Java MapReduce
+with ParquetInputFormat. Parquet is a columnar storage format optimized for
+analytical queries.
+
+Characteristics observed:
+\begin{itemize}
+\item Columnar storage improves compression efficiency
+\item Faster read performance for analytical workloads
+\item Reduced disk I/O
+\item Schema-based structure
+\end{itemize}
+
+\subsection{Avro Format Processing}
+
+The dataset was stored in Avro format and processed using Java MapReduce with
+AvroKeyInputFormat. Avro is a row-based binary serialization format designed for
+efficient distributed processing.
+
+Characteristics observed:
+\begin{itemize}
+\item Compact binary representation
+\item Faster serialization and deserialization
+\item Embedded schema improves data consistency
+\item Suitable for row-based processing
+\end{itemize}
+
+\subsection{Objective of Format Comparison}
+
+The same MapReduce logic was applied across all formats to compute trip frequency
+per hour. Performance differences were evaluated based on execution time,
+storage efficiency, and processing complexity.
+
+\clearpage
+
+\section{Results, Observations, and Post-Mortem Evaluation}
+
+This section presents the results obtained from executing multiple MapReduce jobs on
+the large-scale taxi trip dataset. The analytical workloads were executed on datasets
+stored in CSV, Parquet, and Avro formats. The outputs generated by each workload are
+examined to identify meaningful patterns in the data and evaluate execution behavior of
+the MapReduce framework.
+
+The same MapReduce logic was applied across all file formats to ensure consistent
+outputs. Differences in performance were observed due to variations in storage structure,
+compression, and parsing complexity.
+
+
+\subsection{Result Summary}
+
+Each MapReduce job produced structured output files stored in the Hadoop Distributed
+File System (HDFS). The outputs were retrieved and examined to verify correctness and
+analyze aggregate trends in the taxi trip data. Successful execution across CSV,
+Parquet, and Avro datasets demonstrates the ability of the MapReduce framework to
+process large-scale batch workloads efficiently.
+
+\begin{table}[h]
+\centering
+\caption{Summary of Taxi Trip Analytical Workloads}
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Analysis Type} & \textbf{Mapper Used} & \textbf{Output Directory} \\
+\hline
+Pickup Location Analysis & mapper\_pu.py & /user/taxi/output\_pu \\
+Drop-off Location Analysis & mapper\_do.py & /user/taxi/output\_do \\
+Passenger Count Analysis & mapper\_passengers.py & /user/taxi/output\_passenger \\
+Payment Type Analysis & mapper\_payment.py & /user/taxi/output\_payment \\
+Trip Type Analysis & mapper\_triptype.py & /user/taxi/output\_triptype \\
+Hourly Trip Analysis & mapper\_hour.py & /user/taxi/output\_hour \\
+\hline
+\end{tabular}
+\end{table}
+
+
+\subsection{Execution on CSV, Parquet, and Avro}
+
+MapReduce jobs were executed on datasets stored in CSV, Parquet, and Avro formats.
+Execution logs show successful completion of mapper and reducer tasks across all file
+formats.
+
+CSV datasets required additional parsing during execution due to text-based storage.
+Parquet datasets demonstrated improved disk read efficiency due to columnar storage,
+while Avro datasets provided efficient binary serialization with consistent schema
+representation.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.9\textwidth]{csv_execution.png}
+\caption{CSV MapReduce Execution}
+\end{figure}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.9\textwidth]{parquet_execution.png}
+\caption{Parquet MapReduce Execution}
+\end{figure}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.9\textwidth]{avro_execution.png}
+\caption{Avro MapReduce Execution}
+\end{figure}
+
+
+\subsection{Pickup Location Frequency Analysis}
+
+The pickup location frequency analysis computes the total number of taxi trips
+originating from each pickup location. The results show that a limited number of
+locations account for a large proportion of taxi demand.
+
+This skewed distribution results in uneven reducer workloads during MapReduce
+execution across all file formats.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.9\textwidth]{Picture3.png}
+\caption{Pickup Location Frequency Analysis Output}
+\end{figure}
+
+
+\subsection{Drop-off Location Frequency Analysis}
+
+The drop-off location analysis identifies commonly used destinations in taxi trips.
+Certain drop-off locations dominate the distribution, indicating concentrated travel
+demand patterns.
+
+This workload demonstrates shuffle overhead caused by skewed key distribution in
+MapReduce processing.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.9\textwidth]{Picture5.png}
+\caption{Drop-off Location Frequency Analysis Output}
+\end{figure}
+
+
+\subsection{Passenger Count Distribution Analysis}
+
+The passenger count distribution analysis examines how taxi trips are distributed based
+on number of passengers per trip. The results indicate that trips with one or two
+passengers occur most frequently.
+
+Due to limited distinct values, this workload results in balanced reducer execution.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.9\textwidth]{Picture7.png}
+\caption{Passenger Count Distribution Output}
+\end{figure}
+
+
+\subsection{Payment Type Frequency Analysis}
+
+The payment type frequency analysis evaluates distribution of payment methods used
+by passengers. The results show dominant usage of certain payment types.
+
+Balanced key distribution results in efficient reducer execution.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.9\textwidth]{Picture10.png}
+\caption{Payment Type Frequency Distribution Output}
+\end{figure}
+
+
+\subsection{Trip Type Distribution Analysis}
+
+The trip type distribution analysis categorizes taxi trips based on service classification.
+Certain trip types account for majority of services.
+
+Limited key variation results in efficient MapReduce aggregation.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.9\textwidth]{Picture9.png}
+\caption{Trip Type Distribution Output}
+\end{figure}
+
+
+\subsection{Hourly Trip Frequency Analysis}
+
+The hourly analysis computes total number of taxi trips occurring in each hour of the
+day. The output consists of 24 key-value pairs representing trip frequency distribution
+from hour 0 to hour 23.
+
+This workload was executed on CSV, Parquet, and Avro datasets to compare execution
+performance across storage formats.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=\textwidth]{hour_output.png}
+\caption{Hourly Trip Frequency Output}
+\end{figure}
+
+
+\subsection{Comparative Performance Analysis}
+
+Comparison of execution behavior shows that storage format influences processing
+efficiency. CSV format requires text parsing which increases processing overhead.
+Parquet format improves performance through columnar compression and reduced disk
+I/O. Avro format provides efficient binary serialization and schema consistency.
+
+Location-based analyses exhibit higher shuffle overhead due to skewed key distribution,
+while categorical analyses such as payment type and trip type demonstrate balanced
+reducer workloads.
+
+\begin{table}[H]
+\centering
+\caption{Execution Time Comparison Across Different Systems}
+
+\begin{tabular}{|c|c|c|c|c|}
+\hline
+
+\textbf{System} & \textbf{Sequential} & \textbf{CSV (Hadoop)} & \textbf{Parquet (Hadoop)} & \textbf{Avro (Hadoop)} \\
+
+\hline
+
+System 1 & 9m 23s & 20m 53s & 10m 10s & 5m 30s \\
+
+System 2 & 8m 30s & 18m 30s & 9m 50s & 4m 58s \\
+
+System 3 & 18m 30s & 40m 00s & 22m 14s & 11m 18s \\
+
+\hline
+
+\end{tabular}
+
+\end{table}
+
+
+
+\subsection{Comparison with Sequential Processing}
+
+Sequential processing executes operations on a single machine without parallelism.
+Processing large datasets sequentially results in higher execution time and limited
+scalability.
+
+MapReduce improves performance by dividing data into multiple splits processed in
+parallel across distributed nodes. Fault tolerance mechanisms ensure reliable job
+completion even when node failures occur.
+
+Distributed processing significantly reduces execution time compared to sequential
+processing when handling large datasets.
+
+\begin{table}[H]
+\centering
+\caption{Comparison of Sequential Processing and Hadoop-based File Formats}
+
+\begin{adjustbox}{width=\textwidth}
+
+\begin{tabular}{|l|c|c|c|c|}
+\hline
+
+\textbf{Aspect} & \textbf{Sequential} & \textbf{CSV} & \textbf{Parquet} & \textbf{Avro} \\
+
+\hline
+
+Execution Model & Single node & Distributed & Distributed & Distributed \\
+
+Storage Location & Local FS & HDFS & HDFS & HDFS \\
+
+Parallelism & No & Yes & Yes & Yes \\
+
+Scalability & Low & High & High & High \\
+
+Fault Tolerance & No & Yes & Yes & Yes \\
+
+Large Dataset Handling & Poor & Good & Very Good & Very Good \\
+
+Execution Time & Highest & High & Medium & Lowest \\
+
+Processing Speed & Slow & Moderate & Fast & Fast \\
+
+Storage Efficiency & Low & Medium & High & High \\
+
+Data Format & Text & Row text & Columnar & Binary row \\
+
+Complexity & Low & Medium & Medium & Medium \\
+
+Best Use Case & Small data & General big data & Analytics & Data exchange \\
+
+\hline
+
+\end{tabular}
+
+\end{adjustbox}
+
+\end{table}
+
+
+\subsection{Post-Mortem Evaluation}
+
+Based on observed execution behavior, MapReduce performs reliably for large-scale
+batch aggregation tasks. The framework provides scalability, parallel processing, and
+fault tolerance.
+
+However, shuffle and sort phase introduces disk and network overhead, especially for
+skewed key distributions. CSV processing requires additional parsing effort, while Parquet
+and Avro improve storage efficiency through optimized data representation.
+
+These observations highlight how both processing model and storage format influence
+performance in distributed big data environments.
+\newpage
+\section{Conclusion and Future Scope}
+
+\subsection{Conclusion}
+
+This report presented a comprehensive post-mortem analysis of the Hadoop MapReduce
+programming model using large-scale taxi trip data as a case study. Multiple MapReduce
+jobs were designed and executed to analyze attributes such as pickup location frequency,
+drop-off location frequency, passenger count distribution, payment type frequency, trip
+type classification, and hourly trip distribution.
+
+The dataset was processed using CSV, Parquet, and Avro file formats to evaluate how
+storage structure influences distributed processing performance. The experimental results
+demonstrate that MapReduce efficiently processes large-scale datasets through parallel
+execution, fault tolerance, and scalable architecture.
+
+CSV format provides simplicity and compatibility but requires additional parsing due to
+its text-based structure. Parquet format improves efficiency through columnar storage
+and compression, making it suitable for analytical workloads. Avro format provides
+compact binary serialization along with schema support, enabling efficient distributed
+data exchange.
+
+Comparison with sequential processing shows that distributed MapReduce significantly
+reduces execution time and improves scalability when handling large datasets. The
+post-mortem evaluation highlights that storage format and data characteristics influence
+shuffle overhead, disk usage, and execution efficiency.
+
+
+\subsection{Future Scope}
+
+Future work can extend this study by implementing the same analytical workloads using
+modern distributed processing frameworks such as Apache Spark to compare execution
+performance with MapReduce.
+
+Further analysis can also be performed using larger datasets and multi-node cluster
+configurations to evaluate scalability under real-world big data environments. Additional
+analytical tasks such as trip duration analysis, fare distribution analysis, and peak demand
+prediction can provide deeper insights into transportation patterns.
+
+Visualization tools and dashboards can also be integrated to improve interpretability of
+analytical results and support data-driven decision making.
+\clearpage
+% ----------------------------------
+\end{document}

@@ -1,0 +1,3 @@
+v1
+{"path":"file:///mnt/e/BDA-kafkaCS/stock_prediction_system/data/parquet_files/ticker=GOOG/part-00000-ec9a3ac7-45df-4149-bcd6-a5437dd7332c.c000.snappy.parquet","size":1119,"isDir":false,"modificationTime":1779900987592,"blockReplication":1,"blockSize":33554432,"action":"add"}
+{"path":"file:///mnt/e/BDA-kafkaCS/stock_prediction_system/data/parquet_files/ticker=INFY/part-00001-1b949102-0579-4d78-895b-59c71983740d.c000.snappy.parquet","size":1119,"isDir":false,"modificationTime":1779900987592,"blockReplication":1,"blockSize":33554432,"action":"add"}

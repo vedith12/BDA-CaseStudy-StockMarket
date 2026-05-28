@@ -1,0 +1,2 @@
+v1
+{"path":"file:///mnt/e/BDA-kafkaCS/stock_prediction_system/data/parquet_files/ticker=GOOG/part-00000-32ab928b-86c9-4db5-8ee3-c875149462b2.c000.snappy.parquet","size":1119,"isDir":false,"modificationTime":1777906070566,"blockReplication":1,"blockSize":33554432,"action":"add"}

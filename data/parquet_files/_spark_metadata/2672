@@ -1,0 +1,2 @@
+v1
+{"path":"file:///mnt/e/BDA-kafkaCS/stock_prediction_system/data/parquet_files/ticker=TSLA/part-00000-ab27e82c-0f74-42b3-b1d2-481b80352559.c000.snappy.parquet","size":1118,"isDir":false,"modificationTime":1777905909268,"blockReplication":1,"blockSize":33554432,"action":"add"}
